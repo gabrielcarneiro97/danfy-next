@@ -19,5 +19,12 @@ module.exports = {
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': 'error',
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+    'import/extensions': ['error', 'ignorePackages', {
+      ts: 'never',
+      tsx: 'never',
+      js: 'never',
+      jsx: 'never',
+      mjs: 'never',
+    }],
   },
 };
