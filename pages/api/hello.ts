@@ -6,7 +6,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const prisma = new PrismaClient();
 
-  const pessoa = await prisma.pessoa.findOne({ where: { cpfCnpj: '11009961000183' }, include: { endereco: true } });
+  const pessoa = await prisma.pessoa.findOne({
+    where: { cpfcnpj: '11009961000183' },
+    include: { servicos: true },
+  });
   res.statusCode = 200;
   res.json(pessoa);
 };
