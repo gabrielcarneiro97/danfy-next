@@ -39,5 +39,7 @@ export async function criarAliquota(aliquotasParam : AliquotaCreateInput) {
     });
   }
 
+  prisma.disconnect();
+
   return aliquota;
 }
