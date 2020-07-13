@@ -7,240 +7,274 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model tb_acumulado {
-  cofins        Float?
-  id            Int             @default(autoincrement()) @id
-  pis           Float?
-  tb_total_soma tb_total_soma[]
+model Acumulado {
+  cofins    Float?
+  id        Int         @default(autoincrement()) @id
+  pis       Float?
+  totalSoma TotalSoma[]
+
+  @@map("tb_acumulado")
 }
 
-model tb_aliquota {
-  ativo            Boolean
-  cofins           Float?
-  csll             Float?
-  dono_cpfcnpj     String?
-  forma_pagamento  String?
-  icms_aliquota    Float?
-  icms_reducao     Float?
-  id               Int        @default(autoincrement()) @id
-  irpj             Float?
-  iss              Float?
-  iss_profissional Boolean?
-  pis              Float?
-  tributacao       String?
-  validade         DateTime?
-  tb_pessoa        Pessoa? @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
+model Aliquota {
+  ativo           Boolean
+  cofins          Float?
+  csll            Float?
+  donoCpfcnpj     String?   @map("dono_cpfcnpj")
+  formaPagamento  String?   @map("forma_pagamento")
+  icmsAliquota    Float?    @map("icms_aliquota")
+  icmsReducao     Float?    @map("icms_reducao")
+  id              Int       @default(autoincrement()) @id
+  irpj            Float?
+  iss             Float?
+  issProfissional Boolean?  @map("iss_profissional")
+  pis             Float?
+  tributacao      String?
+  validade        DateTime?
+  pessoa          Pessoa?   @relation(fields: [donoCpfcnpj], references: [cpfcnpj])
+
+  @@map("tb_aliquota")
 }
 
-model tb_difal_aliquota {
-  estado_id Int?
-  externo   Float?
-  id        Int        @default(autoincrement()) @id
-  interno   Float?
-  tb_estado tb_estado? @relation(fields: [estado_id], references: [id])
+model DifalAliquota {
+  estadoId Int?    @map("estado_id")
+  externo  Float?
+  id       Int     @default(autoincrement()) @id
+  interno  Float?
+  estado   Estado? @relation(fields: [estadoId], references: [id])
+
+  @@map("tb_difal_aliquota")
 }
 
-model tb_dominio {
+model Dominio {
   cnpj   String?
   codigo String?
   id     Int     @default(autoincrement()) @id
   numero String?
+
+  @@map("tb_dominio")
 }
 
-model tb_endereco {
+model Endereco {
   cep          String?
   complemento  String?
-  estado_id    Int?
-  id           Int           @default(autoincrement()) @id
+  estadoId     Int?       @map("estado_id")
+  id           Int        @default(autoincrement()) @id
   logradouro   String?
-  municipio_id Int?
+  municipioId  Int?       @map("municipio_id")
   numero       String?
-  pais_id      Int?
-  tb_estado    tb_estado?    @relation(fields: [estado_id], references: [id])
-  tb_municipio tb_municipio? @relation(fields: [municipio_id], references: [id])
-  tb_pais      tb_pais?      @relation(fields: [pais_id], references: [id])
+  paisId       Int?       @map("pais_id")
+  estado       Estado?    @relation(fields: [estadoId], references: [id])
+  municipio    Municipio? @relation(fields: [municipioId], references: [id])
+  pais         Pais?      @relation(fields: [paisId], references: [id])
   tb_pessoa    Pessoa[]
+
+  @@map("tb_endereco")
 }
 
-model tb_estado {
-  id                                           Int                 @id
-  nome                                         String?
-  sigla                                        String
-  tb_difal_aliquota                            tb_difal_aliquota[]
-  tb_endereco                                  tb_endereco[]
-  tb_nota_tb_estadoTotb_nota_estado_destino_id tb_nota[]           @relation("tb_estadoTotb_nota_estado_destino_id")
-  tb_nota_tb_estadoTotb_nota_estado_gerador_id tb_nota[]           @relation("tb_estadoTotb_nota_estado_gerador_id")
+model Estado {
+  id                  Int             @id
+  nome                String?
+  sigla               String
+  difalAliquota       DifalAliquota[]
+  endereco            Endereco[]
+  notaEstadoDestinoId Nota[]          @relation("tb_estadoTotb_nota_estado_destino_id")
+  notaEstadoGeradorId Nota[]          @relation("tb_estadoTotb_nota_estado_gerador_id")
+
+  @@map("tb_estado")
 }
 
-model tb_grupo {
-  cor          String?
-  descricao    String?
-  dono_cpfcnpj String?
-  id           Int          @default(autoincrement()) @id
-  nome         String?
-  tb_pessoa    Pessoa?   @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
-  tb_servico   tb_servico[]
+model Grupo {
+  cor         String?
+  descricao   String?
+  donoCpfcnpj String?      @map("dono_cpfcnpj")
+  id          Int          @default(autoincrement()) @id
+  nome        String?
+  pessoa      Pessoa?      @relation(fields: [donoCpfcnpj], references: [cpfcnpj])
+  servico     Servico[]
+
+  @@map("tb_grupo")
 }
 
-model tb_icms {
-  base_calculo    Float?
-  composicao_base Float?
-  difal_destino   Float?
-  difal_origem    Float?
-  id              Int          @default(autoincrement()) @id
-  proprio         Float?
-  tb_imposto      tb_imposto[]
+model Icms {
+  baseCalculo    Float?       @map("base_calculo")
+  composicaoBase Float?       @map("composicao_base")
+  difalDestino   Float?        @map("difal_destino")
+  difalOrigem    Float?        @map("difal_origem")
+  id             Int          @default(autoincrement()) @id
+  proprio        Float?
+  imposto        Imposto[]
+
+  @@map("tb_icms")
 }
 
-model tb_imposto {
-  adicional_ir       Float?
-  cofins             Float?
-  csll               Float?
-  icms_id            Int?
-  id                 Int                  @default(autoincrement()) @id
-  irpj               Float?
-  iss                Float?
-  pis                Float?
-  total              Float?
-  tb_icms            tb_icms?             @relation(fields: [icms_id], references: [id])
-  tb_movimento       tb_movimento[]
-  tb_servico         tb_servico[]
-  tb_total_movimento tb_total_movimento[]
-  tb_total_servico   tb_total_servico[]
-  tb_total_soma      tb_total_soma[]
+model Imposto {
+  adicionalIr    Float?               @map("adicional_ir")
+  cofins         Float?
+  csll           Float?
+  icmsId         Int?                 @map("icms_id")
+  id             Int                  @default(autoincrement()) @id
+  irpj           Float?
+  iss            Float?
+  pis            Float?
+  total          Float?
+  icms           Icms?                @relation(fields: [icmsId], references: [id])
+  movimento      Movimento[]
+  servico        Servico[]
+  totalMovimento tb_total_movimento[]
+  totalServico   tb_total_servico[]
+  totalSoma      TotalSoma[]
+
+  @@map("tb_imposto")
 }
 
-model tb_meta_dados {
-  ativo            Boolean?
-  email            String?
-  md_data_hora     DateTime?
-  md_id            Int           @default(autoincrement()) @id
-  ref_movimento_id Int?
-  ref_servico_id   Int?
-  tipo             String?
-  tb_movimento     tb_movimento? @relation(fields: [ref_movimento_id], references: [id])
-  tb_servico       tb_servico?   @relation(fields: [ref_servico_id], references: [id])
+model MetaDados {
+  id             Int        @default(autoincrement()) @id @map("md_id")
+  ativo          Boolean?
+  email          String?
+  dataHora       DateTime?  @map("md_data_hora")
+  refMovimentoId Int?       @map("ref_movimento_id")
+  refServicoId   Int?       @map("ref_servico_id")
+  tipo           String?
+  movimento      Movimento? @relation(fields: [refMovimentoId], references: [id])
+  servico        Servico?   @relation(fields: [refServicoId], references: [id])
+
+  @@map("tb_meta_dados")
 }
 
-model tb_movimento {
-  conferido                                        Boolean?
-  data_hora                                        DateTime
-  dono_cpfcnpj                                     String
-  id                                               Int             @default(autoincrement()) @id
-  imposto_id                                       Int?
-  lucro                                            Float?
-  meta_dados_id                                    Int?
-  nota_final_chave                                 String
-  nota_inicial_chave                               String?
-  valor_saida                                      Float?
-  tb_pessoa                                        Pessoa       @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
-  tb_imposto                                       tb_imposto?     @relation(fields: [imposto_id], references: [id])
-  tb_nota_tb_movimento_nota_final_chaveTotb_nota   tb_nota         @relation("tb_movimento_nota_final_chaveTotb_nota", fields: [nota_final_chave], references: [chave])
-  tb_nota_tb_movimento_nota_inicial_chaveTotb_nota tb_nota?        @relation("tb_movimento_nota_inicial_chaveTotb_nota", fields: [nota_inicial_chave], references: [chave])
-  tb_meta_dados                                    tb_meta_dados[]
+model Movimento {
+  id               Int         @default(autoincrement()) @id
+  conferido        Boolean?
+  dataHora         DateTime    @map("data_hora")
+  donoCpfcnpj      String      @map("dono_cpfcnpj")
+  impostoId        Int?        @map("imposto_id")
+  lucro            Float?
+  metaDadosId      Int?        @map("meta_dados_id")
+  notaFinalChave   String      @map("nota_final_chave")
+  notaInicialChave String?     @map("nota_inicial_chave")
+  valorSaida       Float?      @map("valor_saida")
+  pessoa           Pessoa      @relation(fields: [donoCpfcnpj], references: [cpfcnpj])
+  imposto          Imposto?    @relation(fields: [impostoId], references: [id])
+  notaFinal        Nota        @relation("tb_movimento_nota_final_chaveTotb_nota", fields: [notaFinalChave], references: [chave])
+  notaInicial      Nota?       @relation("tb_movimento_nota_inicial_chaveTotb_nota", fields: [notaInicialChave], references: [chave])
+  metaDados        MetaDados[]
+
+  @@map("tb_movimento")
 }
 
-model tb_municipio {
+model Municipio {
+  id       Int        @id
+  nome     String
+  endereco Endereco[]
+
+  @@map("tb_municipio")
+}
+
+model Nota {
+  chave                         String           @id
+  cfop                          String?
+  dataHora                      DateTime?        @map("data_hora")
+  destinatarioContribuinte      String?          @map("destinatario_contribuinte")
+  destinatarioCpfcnpj           String           @map("destinatario_cpfcnpj")
+  emitenteCpfcnpj               String           @map("emitente_cpfcnpj")
+  estadoDestinoId               Int?             @map("estado_destino_id")
+  estadoGeradorId               Int?             @map("estado_gerador_id")
+  numero                        String?
+  status                        String?
+  textoComplementar             String?          @map("texto_complementar")
+  tipo                          String?
+  valor                         Float?
+  destinatario                  Pessoa           @relation("tb_nota_destinatario_cpfcnpjTotb_pessoa", fields: [destinatarioCpfcnpj], references: [cpfcnpj])
+  emitente                      Pessoa           @relation("tb_nota_emitente_cpfcnpjTotb_pessoa", fields: [emitenteCpfcnpj], references: [cpfcnpj])
+  estadoDestino                 Estado?          @relation("tb_estadoTotb_nota_estado_destino_id", fields: [estadoDestinoId], references: [id])
+  estadoGerador                 Estado?          @relation("tb_estadoTotb_nota_estado_gerador_id", fields: [estadoGeradorId], references: [id])
+  movimentosComoNotaFinal       Movimento[]      @relation("tb_movimento_nota_final_chaveTotb_nota")
+  movimentosComoNotaInicial     Movimento[]      @relation("tb_movimento_nota_inicial_chaveTotb_nota")
+  produtos                      Produto[]
+  produtoEstoqueComoNotaFinal   ProdutoEstoque[] @relation("tb_notaTotb_produto_estoque_nota_final_chave")
+  produtoEstoqueComoNotaInicial ProdutoEstoque[] @relation("tb_notaTotb_produto_estoque_nota_inicial_chave")
+
+  @@map("tb_nota")
+}
+
+model NotaServico {
+  chave               String    @id
+  dataHora            DateTime  @map("data_hora")
+  descricao           String?
+  destinatarioCpfcnpj String    @map("destinatario_cpfcnpj")
+  emitenteCpfcnpj     String    @map("emitente_cpfcnpj")
+  iss                 Float?
+  numero              String
+  retencaoId          Int?      @map("retencao_id")
+  status              String
+  valor               Float?
+  destinatario        Pessoa    @relation("tb_nota_servico_destinatario_cpfcnpjTotb_pessoa", fields: [destinatarioCpfcnpj], references: [cpfcnpj])
+  emitente            Pessoa    @relation("tb_nota_servico_emitente_cpfcnpjTotb_pessoa", fields: [emitenteCpfcnpj], references: [cpfcnpj])
+  retencao            Retencao? @relation(fields: [retencaoId], references: [id])
+  servicos            Servico[]
+
+  @@map("tb_nota_servico")
+}
+
+model Pais {
   id          Int           @id
   nome        String
-  tb_endereco tb_endereco[]
-}
+  endereco    Endereco[]
 
-model tb_nota {
-  cfop                                                              String?
-  chave                                                             String               @id
-  data_hora                                                         DateTime?
-  destinatario_contribuinte                                         String?
-  destinatario_cpfcnpj                                              String
-  emitente_cpfcnpj                                                  String
-  estado_destino_id                                                 Int?
-  estado_gerador_id                                                 Int?
-  numero                                                            String?
-  status                                                            String?
-  texto_complementar                                                String?
-  tipo                                                              String?
-  valor                                                             Float?
-  tb_pessoa_tb_nota_destinatario_cpfcnpjTotb_pessoa                 Pessoa            @relation("tb_nota_destinatario_cpfcnpjTotb_pessoa", fields: [destinatario_cpfcnpj], references: [cpfCnpj])
-  tb_pessoa_tb_nota_emitente_cpfcnpjTotb_pessoa                     Pessoa            @relation("tb_nota_emitente_cpfcnpjTotb_pessoa", fields: [emitente_cpfcnpj], references: [cpfCnpj])
-  tb_estado_tb_estadoTotb_nota_estado_destino_id                    tb_estado?           @relation("tb_estadoTotb_nota_estado_destino_id", fields: [estado_destino_id], references: [id])
-  tb_estado_tb_estadoTotb_nota_estado_gerador_id                    tb_estado?           @relation("tb_estadoTotb_nota_estado_gerador_id", fields: [estado_gerador_id], references: [id])
-  tb_movimento_tb_movimento_nota_final_chaveTotb_nota               tb_movimento[]       @relation("tb_movimento_nota_final_chaveTotb_nota")
-  tb_movimento_tb_movimento_nota_inicial_chaveTotb_nota             tb_movimento[]       @relation("tb_movimento_nota_inicial_chaveTotb_nota")
-  tb_produto                                                        tb_produto[]
-  tb_produto_estoque_tb_notaTotb_produto_estoque_nota_final_chave   tb_produto_estoque[] @relation("tb_notaTotb_produto_estoque_nota_final_chave")
-  tb_produto_estoque_tb_notaTotb_produto_estoque_nota_inicial_chave tb_produto_estoque[] @relation("tb_notaTotb_produto_estoque_nota_inicial_chave")
-}
-
-model tb_nota_servico {
-  chave                                                     String       @id
-  data_hora                                                 DateTime
-  descricao                                                 String?
-  destinatario_cpfcnpj                                      String
-  emitente_cpfcnpj                                          String
-  iss                                                       Float?
-  numero                                                    String
-  retencao_id                                               Int?
-  status                                                    String
-  valor                                                     Float?
-  tb_pessoa_tb_nota_servico_destinatario_cpfcnpjTotb_pessoa Pessoa    @relation("tb_nota_servico_destinatario_cpfcnpjTotb_pessoa", fields: [destinatario_cpfcnpj], references: [cpfCnpj])
-  tb_pessoa_tb_nota_servico_emitente_cpfcnpjTotb_pessoa     Pessoa    @relation("tb_nota_servico_emitente_cpfcnpjTotb_pessoa", fields: [emitente_cpfcnpj], references: [cpfCnpj])
-  tb_retencao                                               tb_retencao? @relation(fields: [retencao_id], references: [id])
-  tb_servico                                                tb_servico[]
-}
-
-model tb_pais {
-  id          Int           @id
-  nome        String
-  tb_endereco tb_endereco[]
+  @@map("tb_pais")
 }
 
 model Pessoa {
-  cpfCnpj                                                         String               @id @map("cpfcnpj")
-  enderecoId                                                      Int?                 @map("endereco_id")
-  nome                                                            String
-  endereco                                                        tb_endereco?         @relation(fields: [enderecoId], references: [id])
-  tb_aliquota                                                     tb_aliquota[]
-  tb_grupo                                                        tb_grupo[]
-  tb_movimento                                                    tb_movimento[]
-  tb_nota_tb_nota_destinatario_cpfcnpjTotb_pessoa                 tb_nota[]            @relation("tb_nota_destinatario_cpfcnpjTotb_pessoa")
-  tb_nota_tb_nota_emitente_cpfcnpjTotb_pessoa                     tb_nota[]            @relation("tb_nota_emitente_cpfcnpjTotb_pessoa")
-  tb_nota_servico_tb_nota_servico_destinatario_cpfcnpjTotb_pessoa tb_nota_servico[]    @relation("tb_nota_servico_destinatario_cpfcnpjTotb_pessoa")
-  tb_nota_servico_tb_nota_servico_emitente_cpfcnpjTotb_pessoa     tb_nota_servico[]    @relation("tb_nota_servico_emitente_cpfcnpjTotb_pessoa")
-  tb_produto_estoque                                              tb_produto_estoque[]
-  tb_servico                                                      tb_servico[]
-  tb_simples                                                      tb_simples[]
-  tb_total                                                        tb_total[]
+  cpfcnpj               String           @id
+  enderecoId            Int?             @map("endereco_id")
+  nome                  String
+  endereco              Endereco?        @relation(fields: [enderecoId], references: [id])
+  aliquotas             Aliquota[]
+  grupo                 Grupo[]
+  movimentos            Movimento[]
+  notasRecebidas        Nota[]           @relation("tb_nota_destinatario_cpfcnpjTotb_pessoa")
+  notasEmitidas         Nota[]           @relation("tb_nota_emitente_cpfcnpjTotb_pessoa")
+  notasServicoRecebidas NotaServico[]    @relation("tb_nota_servico_destinatario_cpfcnpjTotb_pessoa")
+  notasServicoEmitidas  NotaServico[]    @relation("tb_nota_servico_emitente_cpfcnpjTotb_pessoa")
+  produtosEstoque       ProdutoEstoque[]
+  servicos              Servico[]
+  simples               tb_simples[]
+  total                 tb_total[]
 
   @@map("tb_pessoa")
 }
 
-model tb_produto {
+model Produto {
+  id         Int     @default(autoincrement()) @id
   descricao  String
-  id         Int      @default(autoincrement()) @id
   nome       String
-  nota_chave String?
+  notaChave  String? @map("nota_chave")
   quantidade Int?
   valor      Float?
-  tb_nota    tb_nota? @relation(fields: [nota_chave], references: [chave])
+  nota       Nota?   @relation(fields: [notaChave], references: [chave])
+
+  @@map("tb_produto")
 }
 
-model tb_produto_estoque {
+model ProdutoEstoque {
+  id                                                     Int        @default(autoincrement()) @id
   ativo                                                  Boolean?
   data_entrada                                           DateTime?
   data_saida                                             DateTime?
   descricao                                              String?
   dono_cpfcnpj                                           String?
-  id                                                     Int        @default(autoincrement()) @id
   nota_final_chave                                       String?
   nota_inicial_chave                                     String?
   produto_codigo                                         String?
   valor_entrada                                          Float?
-  tb_pessoa                                              Pessoa? @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
-  tb_nota_tb_notaTotb_produto_estoque_nota_final_chave   tb_nota?   @relation("tb_notaTotb_produto_estoque_nota_final_chave", fields: [nota_final_chave], references: [chave])
-  tb_nota_tb_notaTotb_produto_estoque_nota_inicial_chave tb_nota?   @relation("tb_notaTotb_produto_estoque_nota_inicial_chave", fields: [nota_inicial_chave], references: [chave])
+  tb_pessoa                                              Pessoa? @relation(fields: [dono_cpfcnpj], references: [cpfcnpj])
+  tb_nota_tb_notaTotb_produto_estoque_nota_final_chave   Nota?   @relation("tb_notaTotb_produto_estoque_nota_final_chave", fields: [nota_final_chave], references: [chave])
+  tb_nota_tb_notaTotb_produto_estoque_nota_inicial_chave Nota?   @relation("tb_notaTotb_produto_estoque_nota_inicial_chave", fields: [nota_inicial_chave], references: [chave])
+
+  @@map("tb_produto_estoque")
 }
 
-model tb_retencao {
+model Retencao {
   cofins           Float?
   csll             Float?
   id               Int                @default(autoincrement()) @id
@@ -249,13 +283,15 @@ model tb_retencao {
   iss              Float?
   pis              Float?
   total            Float?
-  tb_nota_servico  tb_nota_servico[]
-  tb_servico       tb_servico[]
+  tb_nota_servico  NotaServico[]
+  tb_servico       Servico[]
   tb_total_servico tb_total_servico[]
-  tb_total_soma    tb_total_soma[]
+  totalSoma        TotalSoma[]
+
+  @@map("tb_retencao")
 }
 
-model tb_servico {
+model Servico {
   conferido       Boolean?
   data_hora       DateTime?
   dono_cpfcnpj    String?
@@ -266,12 +302,12 @@ model tb_servico {
   nota_chave      String?
   retencao_id     Int?
   valor           Float?
-  tb_pessoa       Pessoa?       @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
-  tb_grupo        tb_grupo?        @relation(fields: [grupo_id], references: [id])
-  tb_imposto      tb_imposto?      @relation(fields: [imposto_id], references: [id])
-  tb_nota_servico tb_nota_servico? @relation(fields: [nota_chave], references: [chave])
-  tb_retencao     tb_retencao?     @relation(fields: [retencao_id], references: [id])
-  tb_meta_dados   tb_meta_dados[]
+  tb_pessoa       Pessoa?          @relation(fields: [dono_cpfcnpj], references: [cpfcnpj])
+  tb_grupo        Grupo?           @relation(fields: [grupo_id], references: [id])
+  tb_imposto      Imposto?         @relation(fields: [imposto_id], references: [id])
+  tb_nota_servico NotaServico? @relation(fields: [nota_chave], references: [chave])
+  tb_retencao     Retencao?     @relation(fields: [retencao_id], references: [id])
+  tb_meta_dados   MetaDados[]
 }
 
 model tb_simples {
@@ -285,7 +321,7 @@ model tb_simples {
   total_nao_retido Float?
   total_retido     Float?
   total_servicos   Float?
-  tb_pessoa        Pessoa @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
+  tb_pessoa        Pessoa @relation(fields: [dono_cpfcnpj], references: [cpfcnpj])
 }
 
 model tb_total {
@@ -297,10 +333,10 @@ model tb_total {
   total_servico_id   Int?
   total_soma_id      Int?
   trimestral         Boolean?
-  tb_pessoa          Pessoa?          @relation(fields: [dono_cpfcnpj], references: [cpfCnpj])
+  tb_pessoa          Pessoa?          @relation(fields: [dono_cpfcnpj], references: [cpfcnpj])
   tb_total_movimento tb_total_movimento? @relation(fields: [total_movimento_id], references: [id])
   tb_total_servico   tb_total_servico?   @relation(fields: [total_servico_id], references: [id])
-  tb_total_soma      tb_total_soma?      @relation(fields: [total_soma_id], references: [id])
+  totalSoma          TotalSoma?      @relation(fields: [total_soma_id], references: [id])
 }
 
 model tb_total_movimento {
@@ -308,7 +344,7 @@ model tb_total_movimento {
   imposto_id  Int?
   lucro       Float?
   valor_saida Float?
-  tb_imposto  tb_imposto? @relation(fields: [imposto_id], references: [id])
+  tb_imposto  Imposto? @relation(fields: [imposto_id], references: [id])
   tb_total    tb_total[]
 }
 
@@ -317,21 +353,21 @@ model tb_total_servico {
   imposto_id  Int?
   retencao_id Int?
   total       Float?
-  tb_imposto  tb_imposto?  @relation(fields: [imposto_id], references: [id])
-  tb_retencao tb_retencao? @relation(fields: [retencao_id], references: [id])
+  tb_imposto  Imposto?  @relation(fields: [imposto_id], references: [id])
+  tb_retencao Retencao? @relation(fields: [retencao_id], references: [id])
   tb_total    tb_total[]
 }
 
-model tb_total_soma {
+model TotalSoma {
   acumulado_id    Int?
   id              Int           @default(autoincrement()) @id
   imposto_id      Int?
   retencao_id     Int?
   valor_movimento Float?
   valor_servico   Float?
-  tb_acumulado    tb_acumulado? @relation(fields: [acumulado_id], references: [id])
-  tb_imposto      tb_imposto?   @relation(fields: [imposto_id], references: [id])
-  tb_retencao     tb_retencao?  @relation(fields: [retencao_id], references: [id])
+  acumulado       Acumulado? @relation(fields: [acumulado_id], references: [id])
+  tb_imposto      Imposto?   @relation(fields: [imposto_id], references: [id])
+  tb_retencao     Retencao?  @relation(fields: [retencao_id], references: [id])
   tb_total        tb_total[]
 }
 
