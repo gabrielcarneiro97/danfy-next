@@ -12,25 +12,17 @@ type Props = {
 }
 
 export default function Home({ session } : Props) {
-  const { loading } = usePrivate();
+  const { isLoading } = usePrivate();
 
-  return (
+  return isLoading(
     <>
-      {
-      !loading
-      && (
       <div>
-        <div>
-          {loading}
-        </div>
         {JSON.stringify(session)}
         <div>
           <Button onClick={signout}>Sair</Button>
         </div>
       </div>
-      )
-    }
-    </>
+    </>,
   );
 }
 

@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+
 import { useSession, signin } from 'next-auth/client';
+import LoadingScreen from 'src/components/LoadingScreen';
 
 export default function usePrivate() {
   const [session, sessionLoad] = useSession();
@@ -13,5 +15,10 @@ export default function usePrivate() {
     }
   }, [sessionLoad, session]);
 
-  return { loading };
+  const isLoading = useCallback(
+    (component : JSX.Element) => (loading ? <LoadingScreen /> : component),
+    [loading],
+  );
+
+  return { loading, isLoading };
 }

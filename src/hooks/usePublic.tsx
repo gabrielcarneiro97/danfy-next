@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
+
+import LoadingScreen from 'src/components/LoadingScreen';
 
 export default function usePublic(onlyUnknownUser = true) {
   const router = useRouter();
@@ -17,5 +19,10 @@ export default function usePublic(onlyUnknownUser = true) {
     }
   }, [sessionLoad, session]);
 
-  return { loading };
+  const isLoading = useCallback(
+    (component : JSX.Element) => (loading ? <LoadingScreen /> : component),
+    [loading],
+  );
+
+  return { loading, isLoading };
 }
