@@ -1,25 +1,36 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
-import { signin, signout } from 'next-auth/client';
 import { isAuth, Session } from 'services/auth';
+
+import { signout } from 'next-auth/client';
+
+import usePrivate from 'src/hooks/usePrivate';
+import { Button } from 'antd';
 
 type Props = {
   session : Session | null,
 }
 
 export default function Home({ session } : Props) {
-  console.log(session);
+  const { loading } = usePrivate();
+
   return (
-    <div>
+    <>
       {
-        !session
-        && <button type="button" onClick={signin}>Login</button>
-      }
-      {
-        session
-        && <button type="button" onClick={signout}>Logout</button>
-      }
-    </div>
+      !loading
+      && (
+      <div>
+        <div>
+          {loading}
+        </div>
+        {JSON.stringify(session)}
+        <div>
+          <Button onClick={signout}>Sair</Button>
+        </div>
+      </div>
+      )
+    }
+    </>
   );
 }
 
