@@ -1,5 +1,5 @@
 import {
-  PrismaClient, ProdutoEstoqueCreateInput, Nota, Movimento, ProdutoEstoque, prismaVersion,
+  PrismaClient, ProdutoEstoqueCreateInput, Nota, Movimento, ProdutoEstoque,
 } from '@prisma/client';
 import { stringToDate } from '../../services/date';
 import { pegarNotasEntradaEmitentePeriodo } from './nota';
