@@ -29,6 +29,7 @@ export default function MainMenu() {
           <Link href="/importar">
             <>
               <DownloadOutlined />
+              {' '}
               Importar Notas
             </>
           </Link>
@@ -37,6 +38,7 @@ export default function MainMenu() {
           <Link href="/clientes">
             <>
               <TeamOutlined />
+              {' '}
               Gerenciar Clientes
             </>
           </Link>
@@ -45,6 +47,7 @@ export default function MainMenu() {
           <Link href="/visualizar">
             <>
               <FolderOpenOutlined />
+              {' '}
               Visualizar Movimento
             </>
           </Link>
@@ -53,6 +56,7 @@ export default function MainMenu() {
           <Link href="/estoque">
             <>
               <InboxOutlined />
+              {' '}
               Estoque
             </>
           </Link>
