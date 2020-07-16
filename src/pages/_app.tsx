@@ -11,9 +11,10 @@ moment.locale('pt-br');
 
 export default ({ Component, pageProps }: AppProps) => {
   const { session } = pageProps;
+  console.log(process.env.site);
 
   return (
-    <Provider options={{ site: process.env.SITE || 'http://localhost:3000' }} session={session}>
+    <Provider options={{ site: process.env.SITE }} session={session}>
       <Component {...pageProps} /> {/* eslint-disable-line */}
     </Provider>
   );

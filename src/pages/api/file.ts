@@ -14,9 +14,7 @@ export default async (req : NextApiRequest & { file : any }, res : NextApiRespon
 
   const obj = conversor(req.file);
 
-  console.log(servico.localizador.qualCidade(obj)(obj)[0].notaServico.chave);
-
-  res.json('Hello');
+  res.json(servico.localizador.qualCidade(obj)(obj));
 };
 
 export const config = {
