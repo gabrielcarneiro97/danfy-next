@@ -14,7 +14,6 @@
     "apollo-server-micro": "^2.15.1",
     "graphql": "^15.3.0",
     "graphql-request": "^2.0.0",
-    "graphql-tag": "^2.10.4",
     "micro": "^9.3.4",
     "moment": "^2.27.0",
     "multer": "^1.4.2",

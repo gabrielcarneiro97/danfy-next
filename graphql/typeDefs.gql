@@ -1,0 +1,105 @@
+scalar DateTime
+
+type Pais {
+  id:   Int
+  nome: String
+}
+
+type Estado {
+  id:    Int
+  nome:  String
+  sigla: String
+}
+
+type Municipio {
+  id:   Int
+  nome: String
+}
+
+type Endereco {
+  id:          Int
+  cep:         String
+  complemento: String
+  logradouro:  String
+  numero:      String
+  estado:      Estado
+  pais:        Pais
+  municipio:   Municipio
+}
+
+type Aliquota {
+  id:              Int
+  ativo:           Boolean
+  cofins:          Float
+  csll:            Float
+  donoCpfcnpj:     String
+  formaPagamento:  String
+  icmsAliquota:    Float
+  icmsReducao:     Float
+  irpj:            Float
+  iss:             Float
+  issProfissional: Boolean
+  pis:             Float
+  tributacao:      String
+  validade:        DateTime
+}
+
+type Pessoa {
+  cpfcnpj:    String
+  nome:       String
+  endereco:   Endereco
+  aliquotas:  [Aliquota]
+}
+
+type Produto {
+  id:         Int
+  descricao:  String
+  nome:       String
+  quantidade: Int
+  valor:      Float
+}
+
+type Nota {
+  chave:             String
+  cfop:              String
+  dataHora:          DateTime
+  numero:            String
+  status:            String
+  textoComplementar: String
+  tipo:              String
+  valor:             Float
+  destinatario:      Pessoa
+  emitente:          Pessoa
+  estadoDestino:     Estado
+  estadoGerador:     Estado
+  produtos:          [Produto]
+}
+
+type Retencao {
+  id:     Int
+  cofins: Float
+  csll:   Float
+  inss:   Float
+  irpj:   Float
+  iss:    Float
+  pis:    Float
+  total:  Float
+}
+
+type NotaServico {
+  chave:        String
+  dataHora:     DateTime
+  descricao:    String
+  iss:          Float
+  numero:       String
+  status:       String
+  valor:        Float
+  destinatario: Pessoa
+  emitente:     Pessoa
+  retencao:     Retencao
+}
+
+type Query {
+  nota(chave: String!): Nota
+  notaServico(chave: String!): NotaServico
+}
