@@ -10,11 +10,17 @@ export type Municipio = {
 
 export default class EnderecoXml {
   logradouro : string;
+
   numero : string;
+
   complemento : string;
+
   bairro : string;
+
   municipio : Municipio;
+
   estado : string;
+
   pais : Pais;
 
   cep : string;

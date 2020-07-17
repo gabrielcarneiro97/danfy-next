@@ -61,6 +61,7 @@ model Endereco {
   complemento  String?
   estadoId     Int?       @map("estado_id")
   logradouro   String?
+  bairro       String?
   municipioId  Int?       @map("municipio_id")
   numero       String?
   paisId       Int?       @map("pais_id")
@@ -75,7 +76,7 @@ model Endereco {
 model Estado {
   id                     Int             @id
   nome                   String?
-  sigla                  String
+  sigla                  String          @unique
   difalAliquota          DifalAliquota[]
   endereco               Endereco[]
   notasComoEstadoDestino Nota[]          @relation("tb_estadoTotb_nota_estado_destino_id")

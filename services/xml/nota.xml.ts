@@ -13,8 +13,6 @@ export type InformacoesEstaduais = {
   destinatarioContribuinte : string;
 }
 
-export type Valor = { total : string };
-
 export type Complementar = {
   notaReferencia? : string;
   textoComplementar? : string;
@@ -31,7 +29,7 @@ export default class NotaXml {
 
   informacoesEstaduais : InformacoesEstaduais;
 
-  valor : Valor;
+  valor : number;
 
   complementar : Complementar;
 

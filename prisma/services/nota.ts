@@ -1,16 +1,85 @@
-import { PrismaClient, NotaCreateInput } from '@prisma/client';
+import { NotaCreateInput } from '@prisma/client';
+import prisma from 'prisma';
+
+import NotaPessoas from 'services/xml/notaPessoas.xml';
+import { pessoaXmlToUpdateObj, pessoaXmlToCreateObj } from './pessoa';
+
+export async function upsertNotaPessoas(notaPessoas : NotaPessoas) {
+  const { nota, emitente, destinatario } = notaPessoas;
+
+  const { informacoesEstaduais } = nota;
+
+  const notaPlain = {
+    chave: nota.chave,
+    valor: nota.valor,
+    textoComplementar: nota.complementar.textoComplementar,
+    destinatarioContribuinte: informacoesEstaduais.destinatarioContribuinte,
+    ...nota.geral,
+    dataHora: new Date(nota.geral.dataHora),
+  };
+
+  delete notaPlain.naturezaOperacao;
+
+  const res = await prisma.nota.upsert({
+    update: {
+      ...notaPlain,
+      estadoGerador: {
+        connect: {
+          sigla: informacoesEstaduais.estadoGerador,
+        },
+      },
+      estadoDestino: {
+        connect: {
+          sigla: informacoesEstaduais.estadoDestino,
+        },
+      },
+      emitente: {
+        update: pessoaXmlToUpdateObj(emitente),
+      },
+      destinatario: {
+        update: pessoaXmlToUpdateObj(destinatario),
+      },
+    },
+    create: {
+      ...notaPlain,
+      estadoGerador: {
+        connect: {
+          sigla: informacoesEstaduais.estadoGerador,
+        },
+      },
+      estadoDestino: {
+        connect: {
+          sigla: informacoesEstaduais.estadoDestino,
+        },
+      },
+      emitente: {
+        create: pessoaXmlToCreateObj(emitente),
+        connect: {
+          cpfcnpj: emitente.cpfcnpj,
+        },
+      },
+      destinatario: {
+        create: pessoaXmlToCreateObj(destinatario),
+        connect: {
+          cpfcnpj: destinatario.cpfcnpj,
+        },
+      },
+    },
+    where: {
+      chave: nota.chave,
+    },
+  });
+
+  return res;
+}
 
 export async function criarNota(chave : string, notaParam : NotaCreateInput) {
-  const prisma = new PrismaClient();
-
   const nota = await prisma.nota.create({
     data: {
       chave,
       ...notaParam,
     },
   });
-
-  prisma.disconnect();
 
   return nota;
 }
@@ -19,8 +88,6 @@ export async function pegarNotasEntradaEmitentePeriodo(
   cpfcnpj : string,
   periodo : { inicio : Date, fim : Date },
 ) {
-  const prisma = new PrismaClient();
-
   const [emitidas, recebidas] = await Promise.all([
     prisma.nota.findMany({
       where: {
@@ -49,8 +116,6 @@ export async function pegarNotasEntradaEmitentePeriodo(
       },
     }),
   ]);
-
-  prisma.disconnect();
 
   return [...emitidas, ...recebidas];
 }

@@ -4,7 +4,6 @@ import {
 } from 'xml-js';
 
 import NotaXml, {
-  Valor,
   Complementar,
   InformacoesEstaduais,
   Geral,
@@ -106,12 +105,10 @@ const getInfosEstaduais = (obj : ElementCompact,
   };
 };
 
-const getValores = (obj : ElementCompact) : Valor => {
+const getValores = (obj : ElementCompact) => {
   const info = getInfo(obj);
 
-  return {
-    total: info.total.ICMSTot.vNF['_text'],
-  };
+  return parseFloat(info.total.ICMSTot.vNF['_text']);
 };
 
 const getProdutos = (obj : ElementCompact) : object => {
@@ -129,9 +126,7 @@ const getProdutos = (obj : ElementCompact) : object => {
         numero: prod.qCom['_text'],
         tipo: prod.uCom['_text'],
       },
-      valor: {
-        total: prod.vProd['_text'],
-      },
+      valor: parseFloat(prod.vProd['_text']),
     };
 
     produtos[codigo] = produto;
@@ -146,9 +141,7 @@ const getProdutos = (obj : ElementCompact) : object => {
           numero: prod.qCom['_text'],
           tipo: prod.uCom['_text'],
         },
-        valor: {
-          total: prod.vProd['_text'],
-        },
+        valor: parseFloat(prod.vProd['_text']),
       };
 
       produtos[codigo] = produto;
